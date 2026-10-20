@@ -1,0 +1,19 @@
+{
+  // Node runs our .ts files directly (type stripping), so tsc is only used
+  // for type checking — it never emits JavaScript.
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "nodenext",
+    "types": ["node"],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+
+    // Keep the code compatible with Node's type stripping:
+    // only syntax that can be erased (no enums, namespaces, etc.)
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": ["src"]
+}
