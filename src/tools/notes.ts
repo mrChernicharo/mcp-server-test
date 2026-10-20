@@ -1,6 +1,12 @@
 import type { McpServer } from "@modelcontextprotocol/server";
 import * as z from "zod";
-import { addNote, listNotes, searchNotes, type Note } from "../notes/store.ts";
+import {
+  addNote,
+  listNotes,
+  searchNotes,
+  updateNote,
+  type Note,
+} from "../notes/store.ts";
 
 function formatList(notes: Note[]): string {
   return notes.map((note) => `- ${note.id}: ${note.title}`).join("\n");
@@ -33,6 +39,46 @@ export function registerNoteTools(server: McpServer) {
           isError: true,
         };
       }
+    },
+  );
+
+  server.registerTool(
+    "update_note",
+    {
+      title: "Update note",
+      description: `Replace the title and/or body of an existing note. Fields you omit stay as they are. The id never changes, even if the title does. To add to a note without losing its content, read it first and send the full new body.`,
+      inputSchema: z
+        .object({
+          id: z.string().describe("Id of the note to update"),
+          title: z.string().min(1).optional().describe("New title"),
+          body: z.string().optional().describe("New body in markdown"),
+        })
+        // A refinement runs during validation like any other rule, so the
+        // handler never sees a call with nothing to update.
+        .refine((args) => args.title !== undefined || args.body !== undefined, {
+          message: "Provide a new title, a new body, or both",
+        }),
+      // Overwrites existing content (destructive), but calling it twice with
+      // the same arguments ends in the same state (idempotent).
+      annotations: { destructiveHint: true, idempotentHint: true },
+    },
+    async ({ id, title, body }) => {
+      const note = await updateNote(id, { title, body });
+      if (!note) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `No note with id "${id}". Use list_notes to see the ids.`,
+            },
+          ],
+          isError: true,
+        };
+      }
+
+      // The title is part of resources/list, so a new title changes the list.
+      if (title !== undefined) server.sendResourceListChanged();
+      return { content: [{ type: "text", text: `Updated note "${note.id}"` }] };
     },
   );
 

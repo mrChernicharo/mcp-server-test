@@ -77,6 +77,29 @@ export async function getNote(id: string): Promise<Note | undefined> {
   }
 }
 
+// Replaces the title and/or body of an existing note. The id stays the same
+// even if the title changes, so notes://{id} links keep working.
+export async function updateNote(
+  id: string,
+  changes: { title?: string; body?: string },
+): Promise<Note | undefined> {
+  const current = await getNote(id);
+  if (!current) return undefined;
+
+  // Not `{ ...current, ...changes }`: a key that is present but undefined
+  // (e.g. title when only body was sent) would wipe the current value.
+  const updated = {
+    id,
+    title: changes.title ?? current.title,
+    body: changes.body ?? current.body,
+  };
+  await writeFile(
+    path.join(NOTES_DIR, `${id}.md`),
+    `# ${updated.title}\n\n${updated.body}\n`,
+  );
+  return updated;
+}
+
 export async function searchNotes(query: string): Promise<Note[]> {
   const q = query.toLowerCase();
   const notes = await listNotes();
