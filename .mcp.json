@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "notes": {
+      "command": "/opt/homebrew/bin/node",
+      "args": ["/Users/melodev/Desktop/dev/node/mcp-test/src/server.ts"]
+    }
+  }
+}
