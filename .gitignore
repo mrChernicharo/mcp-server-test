@@ -1,2 +1,5 @@
 node_modules/
 .DS_Store
+
+# notes created through the MCP tools
+data/

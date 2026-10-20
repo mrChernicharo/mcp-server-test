@@ -13,3 +13,11 @@ npx @modelcontextprotocol/inspector --cli node src/server.ts --method tools/call
 ### Run "subtract" tool with args 52 and 40
 
 npx @modelcontextprotocol/inspector --cli node src/server.ts --method tools/call --tool-name subtract --tool-arg a=52 --tool-arg b=40
+
+### Run add_note tool
+
+npx @modelcontextprotocol/inspector --cli node src/server.ts --method tools/call --tool-name add_note --tool-arg title="mercado" --tool-arg body="passar no mercado e comprar azeite"
+
+### Run search_notes tool
+
+mcp-test git:(master) ✗ npx @modelcontextprotocol/inspector --cli node src/server.ts --method tools/call --tool-name search_notes --tool-arg query="azeite"
