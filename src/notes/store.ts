@@ -62,6 +62,21 @@ export async function listNotes(): Promise<Note[]> {
   );
 }
 
+// Ids come from outside (e.g. a client asking for "notes://{id}"), so only
+// accept the slug format we generate. This blocks path tricks like "../secrets".
+const VALID_ID = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+export async function getNote(id: string): Promise<Note | undefined> {
+  if (!VALID_ID.test(id)) return undefined;
+  try {
+    const raw = await readFile(path.join(NOTES_DIR, `${id}.md`), "utf8");
+    return parse(id, raw);
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") return undefined;
+    throw err;
+  }
+}
+
 export async function searchNotes(query: string): Promise<Note[]> {
   const q = query.toLowerCase();
   const notes = await listNotes();

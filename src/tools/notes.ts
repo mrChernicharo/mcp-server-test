@@ -21,6 +21,9 @@ export function registerNoteTools(server: McpServer) {
     async ({ title, body }) => {
       try {
         const note = await addNote(title, body);
+        // A new note means a new resource: tell connected clients to refresh
+        // their resource list.
+        server.sendResourceListChanged();
         return { content: [{ type: "text", text: `Saved note "${note.id}"` }] };
       } catch (err) {
         // Expected failures (like a duplicate title) go back to the model as a

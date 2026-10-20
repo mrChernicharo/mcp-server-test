@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/server";
 import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
+import { registerNoteResources } from "./resources/notes.ts";
 import { registerMathTools } from "./tools/math.ts";
 import { registerNoteTools } from "./tools/notes.ts";
 
@@ -12,6 +13,7 @@ const server = new McpServer({
 
 registerMathTools(server);
 registerNoteTools(server);
+registerNoteResources(server);
 
 // stdio transport: the client launches this process and exchanges JSON-RPC messages over stdin/stdout...
 const transport = new StdioServerTransport();
